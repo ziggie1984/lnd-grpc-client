@@ -1,7 +1,7 @@
 from .common import walletunlocker, ver, walletkit, signer, router, ln, BaseClient, invoices
 from .errors import handle_rpc_errors
 from datetime import datetime
-import binascii
+
 
 class LNDClient(BaseClient):
 
@@ -104,9 +104,7 @@ class LNDClient(BaseClient):
     @handle_rpc_errors
     def build_route(self, amt_msat, oid, hop_pubkeys, **kwargs):
         hop_pubkeys_bytes = [ bytes.fromhex(pk) for pk in hop_pubkeys ]
-        hop_pubkeys_check = [ pk.hex() for pk in hop_pubkeys_bytes ]
-        #print(hop_pubkeys_bytes)
-        #print("\n".join(map(str, hop_pubkeys_check)))
+
 
         request = router.BuildRouteRequest(
             amt_msat=amt_msat,
@@ -115,10 +113,8 @@ class LNDClient(BaseClient):
             final_cltv_delta=400,
             **kwargs
         )
-        try:
-            response = self._router_stub.BuildRoute(request)
-        except Exception as error:
-            print(error)
+        
+        response = self._router_stub.BuildRoute(request)
 
         return response
 
