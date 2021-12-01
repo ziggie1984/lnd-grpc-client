@@ -232,6 +232,13 @@ class LNDClient(BaseClient):
         return response
 
     @handle_rpc_errors
+    def abandon_channel(self, **kwargs):
+        """ ***danger*** Abandon a channel"""
+        response = self._ln_stub.AbandonChannel(ln.AbandonChannelRequest(**kwargs))
+        return response
+
+
+    @handle_rpc_errors
     def open_channel(self, node_pubkey, local_funding_amount, sat_per_byte, **kwargs):
         """Open a channel to an existing peer"""
         request = ln.OpenChannelRequest(
@@ -243,6 +250,7 @@ class LNDClient(BaseClient):
         last_response = None
         start = datetime.now().timestamp()
         for r in self._ln_stub.OpenChannel(request, timeout=5):
+            return r
             last_response = r
             print(last_response)
             if datetime.now().timestamp() > 5:
@@ -256,6 +264,12 @@ class LNDClient(BaseClient):
     def list_invoices(self, **kwargs):
         request = ln.ListInvoiceRequest(**kwargs)
         response = self._ln_stub.ListInvoices(request)
+        return response
+
+    @handle_rpc_errors
+    def funding_state_step(self, shim_register=None, shim_cancel=None, psbt_verify=None, psbt_finalize=None):
+        request = ln.FundingTransitionMsg(shim_register=shim_register, shim_cancel=shim_cancel, psbt_verify=psbt_verify, psbt_finalize=psbt_finalize)
+        response = self._ln_stub.FundingStateStep(request)
         return response
 
     @handle_rpc_errors
